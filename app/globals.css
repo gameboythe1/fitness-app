@@ -6,5 +6,10 @@
 * { -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; }
 
+/* Dark mode tweaks */
+.dark .card {
+  @apply border-gray-800 bg-gray-900;
+}
+
 
 
