@@ -1,6 +1,6 @@
 # Fitness App (Next.js, TypeScript, Tailwind)
 
-[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://YOUR_DEPLOY_URL)
+[![Deploy](https://img.shields.io/badge/Live-Vercel-black?logo=vercel)](https://fitness-app-inky-three.vercel.app/)
 
 Mobile-first fitness app: dashboard, activity tracking (with charts), and workouts.
 
