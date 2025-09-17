@@ -1,45 +1,33 @@
+import { StatCard } from './components/StatCard';
+import { BoltIcon, HeartIcon, FireIcon, ClockIcon } from '@heroicons/react/24/solid';
+
 export default function Page() {
   const today = new Date().toLocaleDateString();
   return (
-    <main className="space-y-4">
-      <header className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-gray-500">{today}</p>
-        </div>
-      </header>
+    <main className="space-y-5">
+      <p className="text-sm text-gray-500">{today}</p>
       <section className="grid grid-cols-2 gap-3">
-        <Card title="Steps" value="6,842" subtitle="Today" />
-        <Card title="Calories" value="1,245" subtitle="kcal" />
-        <Card title="Active" value="54m" subtitle="time" />
-        <Card title="Heart" value="72" subtitle="bpm" />
+        <StatCard title="Steps" value="6,842" subtitle="Today" icon={<BoltIcon className="h-5 w-5" />} />
+        <StatCard title="Calories" value="1,245" subtitle="kcal" icon={<FireIcon className="h-5 w-5" />} color="bg-orange-50 text-orange-700" />
+        <StatCard title="Active" value="54m" subtitle="time" icon={<ClockIcon className="h-5 w-5" />} color="bg-emerald-50 text-emerald-700" />
+        <StatCard title="Heart" value="72" subtitle="bpm" icon={<HeartIcon className="h-5 w-5" />} color="bg-rose-50 text-rose-700" />
       </section>
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Recent Activity</h2>
-        <ul className="divide-y rounded-lg border bg-white">
+        <ul className="overflow-hidden rounded-2xl border bg-white">
           {[
             { t: 'Morning Run', d: '3.2 km • 23 min' },
             { t: 'Yoga Session', d: '30 min • Stretch' },
             { t: 'Cycling', d: '8.5 km • 28 min' },
           ].map((it, i) => (
-            <li key={i} className="flex items-center justify-between p-3">
-              <span>{it.t}</span>
+            <li key={i} className="flex items-center justify-between p-4 not-last:border-b">
+              <span className="font-medium">{it.t}</span>
               <span className="text-sm text-gray-500">{it.d}</span>
             </li>
           ))}
         </ul>
       </section>
     </main>
-  );
-}
-
-function Card({ title, value, subtitle }: { title: string; value: string; subtitle: string }) {
-  return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="mt-1 text-2xl font-bold">{value}</p>
-      <p className="text-xs text-gray-400">{subtitle}</p>
-    </div>
   );
 }
 

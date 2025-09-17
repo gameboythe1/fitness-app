@@ -66,7 +66,7 @@ export default function ActivityPage() {
       </section>
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Daily breakdown</h2>
-        <div className="rounded-xl border bg-white p-3">
+        <div className="overflow-hidden rounded-2xl border bg-white p-3">
           <Line
             data={{
               labels: history.map((d) => d.date.slice(5)),
@@ -94,7 +94,7 @@ export default function ActivityPage() {
             }}
           />
         </div>
-        <ul className="divide-y rounded-lg border bg-white">
+        <ul className="overflow-hidden rounded-2xl border bg-white">
           {history.map((d) => (
             <li key={d.date} className="flex items-center justify-between p-3">
               <span className="font-medium">{d.date}</span>

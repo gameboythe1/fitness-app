@@ -44,7 +44,7 @@ export default function WorkoutsPage() {
       </header>
       <ul className="space-y-3">
         {plans.map((p) => (
-          <li key={p.id} className="rounded-xl border bg-white p-4">
+          <li key={p.id} className="rounded-2xl border bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{p.name}</p>
@@ -52,7 +52,7 @@ export default function WorkoutsPage() {
               </div>
               <button
                 onClick={() => complete(p.id)}
-                className="rounded-lg bg-brand-600 px-3 py-2 text-white disabled:opacity-50"
+                className="rounded-lg bg-brand-600 px-3 py-2 text-white shadow hover:brightness-105 active:translate-y-px disabled:opacity-50"
                 disabled={!!p.completedAt}
               >
                 {p.completedAt ? 'Completed' : 'Log'}
