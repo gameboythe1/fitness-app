@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    turbo: true,
+    // Remove unsupported `turbo` flag for Vercel builds
     typedRoutes: true,
   },
 };
