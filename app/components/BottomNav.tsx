@@ -2,13 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { Route } from 'next';
+
+type Tab = { href: Route; label: string };
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const tabs = [
-    { href: '/', label: 'Dashboard' },
-    { href: '/activity', label: 'Activity' },
-    { href: '/workouts', label: 'Workouts' },
+  const tabs: Tab[] = [
+    { href: '/' as Route, label: 'Dashboard' },
+    { href: '/activity' as Route, label: 'Activity' },
+    { href: '/workouts' as Route, label: 'Workouts' },
   ];
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md border-t bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
