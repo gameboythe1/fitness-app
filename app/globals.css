@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile friendly defaults */
+* { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+
+
+

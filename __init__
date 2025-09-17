@@ -1,0 +1,358 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+type Workout = {
+  id: string;
+  name: string;
+  durationMin: number;
+  completedAt?: string;
+};
+
+const defaultPlans: Workout[] = [
+  { id: 'w1', name: 'Full Body Beginner', durationMin: 30 },
+  { id: 'w2', name: 'HIIT Blast', durationMin: 20 },
+  { id: 'w3', name: 'Core Strength', durationMin: 25 },
+];
+
+export default function WorkoutsPage() {
+  const [plans, setPlans] = useState<Workout[]>([]);
+
+  useEffect(() => {
+    const key = 'fitness.workouts.v1';
+    const raw = localStorage.getItem(key);
+    if (raw) setPlans(JSON.parse(raw));
+    else {
+      localStorage.setItem(key, JSON.stringify(defaultPlans));
+      setPlans(defaultPlans);
+    }
+  }, []);
+
+  const complete = (id: string) => {
+    setPlans((prev) => {
+      const next = prev.map((p) => (p.id === id ? { ...p, completedAt: new Date().toISOString() } : p));
+      localStorage.setItem('fitness.workouts.v1', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  return (
+    <main className="space-y-4">
+      <header>
+        <h1 className="text-2xl font-bold">Workouts</h1>
+        <p className="text-sm text-gray-500">Plans and logging</p>
+      </header>
+      <ul className="space-y-3">
+        {plans.map((p) => (
+          <li key={p.id} className="rounded-xl border bg-white p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{p.name}</p>
+                <p className="text-sm text-gray-500">{p.durationMin} min</p>
+              </div>
+              <button
+                onClick={() => complete(p.id)}
+                className="rounded-lg bg-brand-600 px-3 py-2 text-white disabled:opacity-50"
+                disabled={!!p.completedAt}
+              >
+                {p.completedAt ? 'Completed' : 'Log'}
+              </button>
+            </div>
+            {p.completedAt && (
+              <p className="mt-2 text-xs text-green-700">Done at {new Date(p.completedAt).toLocaleString()}</p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+
+type DayEntry = {
+  date: string;
+  steps: number;
+  calories: number;
+};
+
+export default function ActivityPage() {
+  const [history, setHistory] = useState<DayEntry[]>([]);
+
+  useEffect(() => {
+    const key = 'fitness.history.v1';
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      setHistory(JSON.parse(raw));
+    } else {
+      const seed = Array.from({ length: 7 }).map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        return {
+          date: d.toISOString().slice(0, 10),
+          steps: Math.floor(4000 + Math.random() * 6000),
+          calories: Math.floor(900 + Math.random() * 800),
+        } satisfies DayEntry;
+      }).reverse();
+      localStorage.setItem(key, JSON.stringify(seed));
+      setHistory(seed);
+    }
+  }, []);
+
+  const totals = useMemo(() => {
+    return history.reduce(
+      (acc, d) => {
+        acc.steps += d.steps;
+        acc.calories += d.calories;
+        return acc;
+      },
+      { steps: 0, calories: 0 }
+    );
+  }, [history]);
+
+  return (
+    <main className="space-y-4">
+      <header>
+        <h1 className="text-2xl font-bold">Activity</h1>
+        <p className="text-sm text-gray-500">Last 7 days</p>
+      </header>
+      <section className="grid grid-cols-2 gap-3">
+        <Tile title="Total Steps" value={totals.steps.toLocaleString()} />
+        <Tile title="Total Calories" value={`${totals.calories.toLocaleString()} kcal`} />
+      </section>
+      <section className="space-y-2">
+        <h2 className="text-lg font-semibold">Daily breakdown</h2>
+        <ul className="divide-y rounded-lg border bg-white">
+          {history.map((d) => (
+            <li key={d.date} className="flex items-center justify-between p-3">
+              <span className="font-medium">{d.date}</span>
+              <span className="text-sm text-gray-600">{d.steps.toLocaleString()} steps • {d.calories} kcal</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+  );
+}
+
+function Tile({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-xl border bg-white p-4 shadow-sm">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="mt-1 text-2xl font-bold">{value}</p>
+    </div>
+  );
+}
+
+export default function Page() {
+  const today = new Date().toLocaleDateString();
+  return (
+    <main className="space-y-4">
+      <header className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-sm text-gray-500">{today}</p>
+        </div>
+      </header>
+      <section className="grid grid-cols-2 gap-3">
+        <Card title="Steps" value="6,842" subtitle="Today" />
+        <Card title="Calories" value="1,245" subtitle="kcal" />
+        <Card title="Active" value="54m" subtitle="time" />
+        <Card title="Heart" value="72" subtitle="bpm" />
+      </section>
+      <section className="space-y-2">
+        <h2 className="text-lg font-semibold">Recent Activity</h2>
+        <ul className="divide-y rounded-lg border bg-white">
+          {[
+            { t: 'Morning Run', d: '3.2 km • 23 min' },
+            { t: 'Yoga Session', d: '30 min • Stretch' },
+            { t: 'Cycling', d: '8.5 km • 28 min' },
+          ].map((it, i) => (
+            <li key={i} className="flex items-center justify-between p-3">
+              <span>{it.t}</span>
+              <span className="text-sm text-gray-500">{it.d}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+  );
+}
+
+function Card({ title, value, subtitle }: { title: string; value: string; subtitle: string }) {
+  return (
+    <div className="rounded-xl border bg-white p-4 shadow-sm">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="mt-1 text-2xl font-bold">{value}</p>
+      <p className="text-xs text-gray-400">{subtitle}</p>
+    </div>
+  );
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile friendly defaults */
+* { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'Fitness App',
+  description: 'Mobile-first fitness tracker with workouts and dashboard',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className="min-h-dvh bg-gray-50 text-gray-900 antialiased">
+        <div className="mx-auto max-w-md p-4 pb-24">
+          {children}
+        </div>
+        <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md border-t bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+          <ul className="grid grid-cols-3 text-sm">
+            <li>
+              <a className="flex flex-col items-center gap-1 p-3 hover:text-brand-600" href="/">Dashboard</a>
+            </li>
+            <li>
+              <a className="flex flex-col items-center gap-1 p-3 hover:text-brand-600" href="/activity">Activity</a>
+            </li>
+            <li>
+              <a className="flex flex-col items-center gap-1 p-3 hover:text-brand-600" href="/workouts">Workouts</a>
+            </li>
+          </ul>
+        </nav>
+      </body>
+    </html>
+  );
+}
+
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "@next/next/no-img-element": "off"
+  }
+}
+
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#eefaff',
+          100: '#d9f2ff',
+          200: '#b6e6ff',
+          300: '#83d5ff',
+          400: '#45bdff',
+          500: '#159eff',
+          600: '#0b79db',
+          700: '#0b60ad',
+          800: '#0e4f8a',
+          900: '#0f426f',
+        },
+      },
+      borderRadius: {
+        xl: '1rem',
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  experimental: {
+    turbo: true,
+    typedRoutes: true,
+  },
+};
+
+export default nextConfig;
+
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "es2020"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "baseUrl": "."
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+
+{
+  "name": "fitness-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.19",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.5",
+    "postcss": "8.4.39",
+    "tailwindcss": "3.4.9",
+    "typescript": "5.5.4"
+  }
+}
+
+
